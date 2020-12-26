@@ -97,8 +97,6 @@ data1 <- merge(Londonborough, GenderPayGap, by='GSS_CODE')
 ## tmap_mode("view") #interactive map
 tmap_mode('plot') #normal map
 
-breaks = c(-10, 0, 10, 15, 20) 
-
 tm1 <- tm_shape(data1) + 
   tm_polygons(col = "GPG-Mean", 
               title = 'Mean of Gender Pay Gap',
