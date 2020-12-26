@@ -83,19 +83,18 @@ GenderPayGap <- read_excel("genderpaygap2019revised/Table 7.12 - Work Geography 
 #For simply use, rename the columns and round the figures
 names(GenderPayGap) <- c('Borough','GSS_CODE','GPG-Mean')
 
+#In original data set, the mean value is not numeric
 GenderPayGap$`GPG-Mean` <- as.numeric(GenderPayGap$`GPG-Mean`)
 ```
 
 
 ```{r}
-#Use the same GSS code to collaborate two datasets
+#Use the same GSS code to collaborate two data sets
 data1 <- merge(Londonborough, GenderPayGap, by='GSS_CODE')
 
 #It just a preview
 #The complete map would be shown in section 6
-
-## tmap_mode("view") #interactive map
-tmap_mode('plot') #normal map
+tmap_mode('plot') 
 
 tm1 <- tm_shape(data1) + 
   tm_polygons(col = "GPG-Mean", 
@@ -103,8 +102,6 @@ tm1 <- tm_shape(data1) +
               legend.hist = TRUE)+
   tm_layout(legend.outside = TRUE)+
   tm_borders()
-#for interactive map, do not forget +
-#  tm_basemap(server="OpenStreetMap",alpha=0.5)
 
 tm1
 
