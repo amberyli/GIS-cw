@@ -62,7 +62,9 @@ library(dplyr)
 ```
 
 
-## 3. Draw the map for Gender Pay Gap
+## 3. Plots for Gender Pay Gap
+
+### 3.1 Map
 
 ```{r}
 #Set work directory
@@ -111,12 +113,18 @@ tm1
 tmap_save(tm=tm1,filename = 'GenderPayMap.png')
 ```
 
+### 3.2 Other plots
+
 ## 4. Calculation of the Fairness Index
 
-## 5. Draw the map for the Fairness Index
+## 5. Plots for the Fairness Index
+
+### 5.1 Map
+
+### 5.2 Other plots
 
 
-## 6. Collabrate the 2 maps
+## 6. Map Collabration
 'tmap' sth.
 think about the **Legend** and **Scale level**
 ```{}
