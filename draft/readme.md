@@ -1,5 +1,4 @@
 There are drafts of courseworks.
 
- - [ ] final draft
-
-docs files.
+ - [ ] final draft of doc
+ - [ ] final draft of pdf
