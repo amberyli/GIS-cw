@@ -1,1 +1,1 @@
-It is used to stored the png.
+There are the graphs used in the essay
