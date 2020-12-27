@@ -59,6 +59,7 @@ library(here)
 library(readxl)
 library(RSQLite)
 library(dplyr)
+library(ggplot2)
 ```
 
 
@@ -67,17 +68,14 @@ library(dplyr)
 ### 3.1 Map
 
 ```{r}
-#Set work directory
-setwd('~/Documents/CASA/CASA0005-GIS/gis-coursework')
-
 #Read the shp file
-Londonborough <- st_read("statistical-gis-boundaries-london/ESRI/London_Borough_Excluding_MHW.shp")%>%
+Londonborough <- st_read("data/statistical-gis-boundaries-london/ESRI/London_Borough_Excluding_MHW.shp")%>%
   st_transform(., 27700) 
 
 #Read the Gender Pay Gap file 
 #Only extract the data of each borough of Greater London
 #Do not keep the column of the median value
-GenderPayGap <- read_excel("genderpaygap2019revised/Table 7.12 - Work Geography Table 7.12  Gender pay gap 2019.xls", sheet = "All")%>% 
+GenderPayGap <- read_excel("data/genderpaygap2019revised/Table 7.12 - Work Geography Table 7.12  Gender pay gap 2019.xls", sheet = "All")%>% 
   .[c(226:239,241:259),c(1,2,4)]
 
 #For simply use, rename the columns and round the figures
@@ -86,6 +84,14 @@ names(GenderPayGap) <- c('Borough','GSS_CODE','GPG-Mean')
 #In original data set, the mean value is not numeric
 GenderPayGap$`GPG-Mean` <- as.numeric(GenderPayGap$`GPG-Mean`)
 ```
+
+```{r}
+LondonGPGMean <- read_excel("data/genderpaygap2019revised/Table 7.12 - Work Geography Table 7.12  Gender pay gap 2019.xls", sheet = 'All') %>% .[224,c(1,2,4)]
+
+names(LondonGPGMean) <- c('Borough','GSS_CODE','GPG-Mean')
+LondonGPGMean$`GPG-Mean` <- as.numeric(LondonGPGMean$`GPG-Mean`)
+```
+
 
 
 ```{r}
@@ -98,6 +104,7 @@ tmap_mode('plot')
 
 tm1 <- tm_shape(data1) + 
   tm_polygons(col = "GPG-Mean", 
+              breaks = c(-10,0,21.7,30),
               title = 'Mean of Gender Pay Gap',
               legend.hist = TRUE)+
   tm_layout(legend.outside = TRUE)+
@@ -109,6 +116,12 @@ tmap_save(tm=tm1,filename = 'GenderPayMap.png')
 ```
 
 ### 3.2 Other plots
+```{r}
+ggplot(GenderPayGap, aes(x=Borough, y=`GPG-Mean`))+
+  geom_point()
+```
+
+
 
 ## 4. Calculation of the Fairness Index
 
