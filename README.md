@@ -4,7 +4,7 @@ This repository is used to publish all work of Yue Li's coursework of CASA0005 G
 
 ## Checklist
 
-- [ ] Appendix done by R Markdown
+- [x] Appendix done by R Markdown
 - [ ] Essay wrriten in Word
 - [ ] Reference
 - [ ] Output Graph
