@@ -1,4 +1,4 @@
- - [ ] final draft
+- [ ] final draft
 
 There are drafts of courseworks.
 
