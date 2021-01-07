@@ -1,0 +1,390 @@
+---
+title: "Appendix of final assessment"
+author: "YUE LI"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## 1. Dataset
+
+### 1.1 Basemap of London
+
+1. Go to the website  [ONS](https://geoportal.statistics.gov.uk/datasets/8edafbe3276d4b56aec60991cbddda50_2). The title should be:Local Authority Districts (December 2015) Generalised Clipped Boundaries in Great Britain.
+
+
+2. Download the corresponding shapefile;
+
+3. The right name of the file is 'Local_Authority_Districts__December_2015__Boundaries-shp.zip';
+
+4. Unzip the data and save it.
+
+
+### 1.2 Gender Participation Gap
+
+1. Go to [London Datastore](https://data.london.gov.uk/dataset/earnings-workplace-borough);
+
+2. Download 'earnings-workplace-borough.xls' and save it.
+
+
+### 1.3 Gender Employment Gap
+
+1. Go to [London Datastore](https://data.london.gov.uk/dataset/employment-gaps);
+
+2. Navigate to 'employment gaps by gender and disability boroughs.xlsx' and download it, it is also the correct name. 
+
+
+### 1.4 Gender Advancement Gap
+
+1. Go to [London Datastore](https://data.london.gov.uk/dataset/employment-occupation-type-and-gender-borough);
+
+2. Download file 'employment-by-occ-and-gender.xls'.
+
+
+---
+
+## 2. Load packages
+
+There are all the packages needed for running this markdown file. To make things tidy, I choose to mute all the messages following this chunk.
+```{r, message=FALSE}
+library(sf)
+library(tmap)
+library(tmaptools)
+library(tidyverse)
+library(here)
+library(readxl)
+library(RSQLite)
+library(dplyr)
+library(ggplot2)
+library(spdep)
+```
+
+---
+
+## 3. Basemap
+
+
+```{r}
+#Read the shp file
+Londonborough <- st_read('data/Local_Authority_Districts__December_2015__Boundaries-shp/Local_Authority_Districts__December_2015__Boundaries.shp')%>%
+  filter(str_detect(lad15cd, "^E09"))%>%
+  st_transform(., 27700)%>%
+  rename(NAME = lad15nm)
+
+tm0 <- qtm(Londonborough)
+
+tmap_save(tm=tm0,filename = '0.basemap.png')
+
+tm0
+```
+
+---
+
+
+## 4. Gender Pay Gap
+
+### 4.1 Calculation
+```{r}
+#Read the Gender Pay Gap file 
+#Extract male data of Greater London
+PayGap_Male <- read_excel("data/earnings-workplace-borough.xls", sheet = 2)%>% 
+  .[c(2:34),c(2,45)]
+#Extract female data of Greater London
+PayGap_Female <- read_excel("data/earnings-workplace-borough.xls", sheet = 3)%>% 
+  .[c(2:34),c(2,45)]
+
+#For simply use, rename the columns
+names(PayGap_Male) <- c('NAME','GPG_Male')
+names(PayGap_Female) <- c('NAME','GPG_Female')
+
+#In original data set, the mean value is not numeric
+PayGap_Male$GPG_Male <- as.numeric(PayGap_Male$GPG_Male)
+PayGap_Female$GPG_Female <- as.numeric(PayGap_Female$GPG_Female)
+
+#Female value over male value
+PayGap <- merge(PayGap_Male,PayGap_Female, by = 'NAME')
+PayGap$GPG <- PayGap$GPG_Female/PayGap$GPG_Male
+```
+
+### 4.2 Plot Index
+```{r}
+#Collaborate two data sets
+data1 <- merge(Londonborough, PayGap, by='NAME')
+
+#Draw map
+tmap_mode('plot') 
+
+tm1 <- tm_shape(data1) + 
+  tm_polygons(col = "GPG", 
+              title = 'GPG',
+              midpoint = NA,
+              palette="RdPu",
+              legend.hist=T)+
+  tm_layout(legend.outside = TRUE)+
+  tm_borders()+
+  tm_compass()+
+  tm_scale_bar()+
+  tm_credits("(a)", position=c(0,0.85), size=1.5)
+
+
+tmap_save(tm=tm1,filename = '1.GPG.png')
+
+tm1
+```
+
+
+## 5. Employment Gap
+
+### 5.1 Calculation
+```{r}
+#Import
+EmpGap <- read_excel("data/employment gaps by gender and disability boroughs.xlsx", col_names = FALSE, skip = 46, sheet = '2018') %>% .[c(3:35),c(1,8,12)]
+
+#Rename header
+names(EmpGap) <- c('NAME','MaleEmploy','FemaleEmploy')
+
+#In original data set, the value is not numeric
+EmpGap$MaleEmploy <- as.numeric(EmpGap$MaleEmploy)
+EmpGap$FemaleEmploy <- as.numeric(EmpGap$FemaleEmploy)
+
+#Female value over male value
+EmpGap$EG <- EmpGap$FemaleEmploy/EmpGap$MaleEmploy
+```
+### 5.2 Plot Index
+```{r}
+#Use the same GSS code to collaborate two data sets
+data2 <- merge(Londonborough, EmpGap, by='NAME')
+
+#Draw map
+tmap_mode('plot') 
+
+tm2 <- tm_shape(data2) + 
+  tm_polygons(col = "EG",
+              title = 'EG',
+              midpoint = NA,
+              palette="RdPu",
+              legend.hist=T)+
+  tm_layout(legend.outside = TRUE)+
+  tm_borders()+
+  tm_compass()+
+  tm_scale_bar()+
+  tm_credits("(b)", position=c(0,0.85), size=1.5)
+
+tmap_save(tm=tm2,filename = '2.EG.png')
+tm2
+```
+
+## 6. Advancement Gap
+
+### 6.1 Calculation
+```{r}
+#Import file 
+#Extract male data of Greater London
+AdGap0 <- read_excel("data/employment-by-occ-and-gender.xlsx", sheet = '2018')%>% 
+  .[c(3:35),c(2,5,9,13,41,45,49)]
+
+#For simply use, rename the columns
+names(AdGap0) <- c('NAME','Male1','Male2','Male3','Female1','Female2','Female3')
+
+#In original data set, the mean value is not numeric
+AdGap0$Male1 <- as.numeric(AdGap0$Male1)
+AdGap0$Male2 <- as.numeric(AdGap0$Male2)
+AdGap0$Male3 <- as.numeric(AdGap0$Male3)
+AdGap0$Female1 <- as.numeric(AdGap0$Female1)
+AdGap0$Female2 <- as.numeric(AdGap0$Female2)
+AdGap0$Female3 <- as.numeric(AdGap0$Female3)
+
+#update dataset
+AdGap <- AdGap0[,1]
+AdGap$Male <- AdGap0$Male1 + AdGap0$Male2 + AdGap0$Male3
+AdGap$Female <- AdGap0$Female1 + AdGap0$Female2 + AdGap0$Female3
+
+#Female value over male value
+AdGap$AG <- AdGap$Female/AdGap$Male
+
+```
+### 6.2 Plot Index
+```{r}
+#Collaborate two data sets
+data3 <- merge(Londonborough, AdGap, by='NAME')
+
+
+#Draw map
+tmap_mode('plot') 
+
+tm3 <- tm_shape(data3) + 
+  tm_polygons(col = "AG", 
+              title = 'AG',
+              midpoint = NA,
+              palette="RdPu",
+              legend.hist=T)+
+  tm_layout(legend.outside = TRUE)+
+  tm_borders()+
+  tm_compass()+
+  tm_scale_bar()+
+  tm_credits("(c)", position=c(0,0.85), size=1.5)
+
+tmap_save(tm=tm3,filename = '3.AG.png')
+
+tm3
+```
+
+## 7. Economic Fairness Index
+### 7.1 Calculation
+```{r}
+#merge data
+index <- merge(PayGap, EmpGap, by='NAME') %>%
+  merge(.,AdGap,by='NAME')
+
+#If there is missing value, set it to be 0
+index$GPG[is.na(index$GPG)] <- 0
+index$EG[is.na(index$EG)] <- 0
+index$AG[is.na(index$AG)] <- 0
+
+#calculate standard deviation
+#and change per 1% point
+sdGPG <- sd(index$GPG)
+per_sdGPG <- 0.01/sdGPG
+
+sdEG <- sd(index$EG)
+per_sdEG <- 0.01/sdEG
+
+sdAG <- sd(index$AG, na.rm=TRUE)
+per_sdAG <- 0.01/sdAG
+
+SUM <- per_sdGPG + per_sdEG + per_sdAG
+
+#Calculate the weight
+weight_GPG <- per_sdGPG /SUM
+weight_EG <- per_sdEG /SUM
+weight_AG <- per_sdAG/SUM
+
+#update original value
+index$u_GPG <- weight_GPG * index$GPG
+index$u_EG <- weight_EG * index$EG
+index$u_AG <- weight_AG * index$AG
+
+index$INDEX <- index$u_GPG + index$u_EG + index$u_AG
+index$INDEX <- as.numeric(index$INDEX)
+```
+
+
+### 7.2 Plot Index
+```{r}
+#Use the same GSS code to collaborate two data sets
+data4 <- merge(Londonborough, index, by='NAME')
+
+tmap_mode('plot') 
+
+tm4 <- tm_shape(data4) + 
+  tm_polygons(col = "INDEX",
+              title = 'EGFI',
+              midpoint = NA,
+              palette="RdPu",
+              legend.hist=T)+
+  tm_layout(legend.outside = TRUE)+
+  tm_borders()+
+  tm_compass()+
+  tm_scale_bar()+
+  tm_credits("(d)", position=c(0,0.85), size=1.5)
+
+tmap_save(tm=tm4,filename = '4.index.png')
+
+tm4
+```
+
+### 7.3 Plot together
+```{r,message=FALSE}
+t = tmap_arrange(tm1,tm2,tm3,tm4)
+tmap_save(tm=t,filename = '5.all.png')
+
+t
+```
+
+### 7.4. Rank Line Graph
+```{r}
+data6 <- index[,c(1,4,7,10,14)]
+
+
+data6$GPG_rank <- rank(data6$GPG)
+data6$EG_rank <- rank(data6$EG)
+data6$AG_rank <- rank(data6$AG)
+data6$INDEX_rank <- rank(data6$INDEX)
+
+rank1 <- cbind(data6$NAME,data6$GPG_rank,'1.GPG')
+rank2 <- cbind(data6$NAME,data6$EG_rank,'2.EG')
+rank3 <- cbind(data6$NAME,data6$AG_rank,'3.AG')
+rank4 <- cbind(data6$NAME,data6$INDEX_rank,'4.INDEX')
+
+rank <- as.data.frame(rbind(rank1,rank2,rank3,rank4))
+names(rank) <- c('Borough','Rank','Type')
+
+rank[,2] <- as.numeric(rank[,2])
+
+
+linegraph<-
+  ggplot(rank, aes(x= Type, y = Rank, group=Borough))+
+  geom_line(aes(color=Borough))+
+  theme(legend.position="bottom",
+        legend.text = element_text(size = 5),
+        legend.title = element_text(size= 7))
+ggsave('6.linegraph.png')
+
+linegraph
+```
+
+
+## 8. Spatial analysis
+
+```{r}
+#Use the data containing INDEX and Geographic Information
+data5 <- data4
+
+#Check NA values
+which(is.na(data5$GPG),arr.ind = TRUE)
+which(is.na(data5$EG),arr.ind = TRUE)
+which(is.na(data5$AG),arr.ind = TRUE)
+which(is.na(data5$INDEX),arr.ind = TRUE)
+```
+
+
+```{r}
+#Find centroids of each borough
+data5_cen <- st_geometry(st_centroid(data5))
+
+#Neighbour
+data5_nb <- poly2nb(data5, queen=T)
+
+#Add centroids and Neighbor together to check
+plot(data5_nb, data5_cen, col="red")
+plot(data5$geometry, add = T)
+```
+
+
+```{r}
+#Weight
+data5.weight <- nb2listw(data5_nb, style="W")
+
+#Moran Test
+moran.test(data5$INDEX, data5.weight)
+#Find confidence interval
+z1 <- qnorm(0.1645/2,lower.tail = FALSE)
+0.06931420 + z1 * sqrt(0.01061529)
+0.06931420 - z1 * sqrt(0.01061529)
+
+#Geary’s C Test
+geary.test(data5$INDEX, data5.weight)
+#Find confidence interval
+z2 <- qnorm(0.1773/2, lower.tail = FALSE)
+0.90303349 + z2 * sqrt(0.01097463)
+0.90303349 - z2 * sqrt(0.01097463)
+```
+
+
+
+
+
+
+
+
