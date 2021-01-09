@@ -2,9 +2,9 @@
 
 Here is used to publish all work of Yue Li's coursework of CASA0005 GIS module.
 
-**If want to reproduce my work, please use the file in the folders, data and final version**
+**If want to reproduce my work, please use the files in data and final version**
 
-## File published here
+## File published
 
 ### In 'data' folder
 - [x] Raw datasets
