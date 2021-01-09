@@ -2,15 +2,19 @@
 
 This repository is used to publish all work of Yue Li's coursework of CASA0005 GIS module.
 
-**If want to reproduce my work, please use the file in final version**
+**If want to reproduce my work, please use the file in the folder final version**
 
+## R pub link
+You could go to the [link](https://rpubs.com/amberyli/GISappendix) to see my code with output
 
+## File published here
 
-File published
+### In 'data' folder
+- [x] Raw datasets
+- [x] produced work
+- [x] graph of workflow
 
-- [x] Appendix done by R Markdown
-- [x] Essay wrriten in word
-- [x] The corresponding pdf file
+### In 'final version' folder
 
-Due to the copyright, please go to the website mentioned in rmd and download the datasets.
-None of these datasets would publish in my repository.
+- [x] Appendix written in R Markdown
+- [ ] Essay wrriten in word but exported as pdf
