@@ -17,4 +17,4 @@ You could go to the [link](https://rpubs.com/amberyli/GISappendix) to see my cod
 ### In 'final version' folder
 
 - [x] Appendix written in R Markdown
-- [ ] Essay wrriten in word but exported as pdf
+- [x] Essay exported as pdf
