@@ -1,11 +1,11 @@
 # GIS Final Assessment of YUE LI
 
-This repository is used to publish all work of Yue Li's coursework of CASA0005 GIS module.
+Here is used to publish all work of Yue Li's coursework of CASA0005 GIS module.
 
-**If want to reproduce my work, please use the file in the folder final version**
+**If want to reproduce my work, please use the file in the folders, data and final version**
 
 ## R pub link
-You could go to the [link](https://rpubs.com/amberyli/GISappendix) to see my code with output
+You could go to the [link](https://rpubs.com/amberyli/GISappendix) to see my code with outputs
 
 ## File published here
 
