@@ -10,7 +10,7 @@ Here is used to publish all work of Yue Li's coursework of CASA0005 GIS module.
 - [x] Raw datasets
 - [x] produced work of plots
 - [x] produced work of datasets (not fully included in RPub)
-- [x] graph of workflow (not included in RPub)
+- [x] graph and code of workflow (not included in RPub)
 
 ### In 'final version' folder
 
