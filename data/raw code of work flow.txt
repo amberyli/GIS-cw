@@ -1,0 +1,39 @@
+#background: transparent
+#.purple: bold fill=#D3C1DD visual=roundrect
+#.green: fill=#66cdaa visual=input
+#.orange: fill=#ffa07a 
+#.pink: fill=pink visual=rhomb
+[<purple> START] -> [<green>Download Subindexes Data]
+[<purple> START] -> [<green>Download Basemap Data]
+
+[Download Basemap Data] -> [<orange>Study Area .shp file]
+[Study Area .shp file] -> [<green>Import into R]
+[Import into R] -> [<orange> London Borough Layer]
+
+[Download Subindexes Data] -> [<orange>Earning .xls file]
+[Earning .xls file] -> [<green>Import into R to calculate GPG]
+[Import into R to calculate GPG] -> [<pink>Any missing value]
+
+[Download Subindexes Data] -> [<orange>Employment rate .xls file]
+[Employment rate .xls file]-> [<green>Import into R to calculate EG]
+[Import into R to calculate EG] -> [<pink>Any missing value]
+
+[Download Subindexes Data] -> [<orange>Employment by occupation .xls file]
+[Employment by occupation .xls file]-> [<green>Import into R to calculate AG]
+[Import into R to calculate AG] -> [<pink>Any missing value]
+
+[Any missing value] -> [YES]
+[Any missing value] -> [NO]
+[YES] -> [<green>Change NA to 0]
+[Change NA to 0] -> [<orange>Calculate INDEX]
+[NO] -> [<green>Update GPG, EG, AG]
+[Update GPG, EG, AG] -> [Calculate INDEX]
+
+[Calculate INDEX] -> [<green>Comprehensive Visualization]
+[<orange> London Borough Layer] -> [<green>Comprehensive Visualization]
+
+[Calculate INDEX] -> [<green>Spatial Pattern Analysis]
+[<orange> London Borough Layer] -> [<green>Spatial Pattern Analysis]
+
+[Spatial Pattern Analysis] -> [<purple> END]
+[Comprehensive Visualization] -> [<purple> END]
