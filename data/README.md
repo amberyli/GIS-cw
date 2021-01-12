@@ -1,5 +1,18 @@
 ## There are the datsets used in my assessment and my produced work.
 
-Note the file labled files and 'workflow.png' are used in the writing.
+## The original datasets are:
 
-The rest 3 xls files and zip are the raw dataset.
+- Local_Authority_Districts__December_2015__Boundaries-shp.zip
+- earnings-workplace-borough.xls
+- employment gaps by gender and disability boroughs.xlsx
+- employment-by-occ-and-gender.xlsx
+
+The further instructions are stated in my rmd file.
+
+## My work:
+
+- the rest
+
+Note:
+
+**raw code of work flow.txt** is not the original code of the workflow graph. It is stored as txt file in order to reproducing it.
